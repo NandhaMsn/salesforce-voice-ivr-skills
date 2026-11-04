@@ -1,0 +1,63 @@
+{
+  "Version": "2019-10-30",
+  "StartAction": "b1-hours",
+  "Metadata": {
+    "name": "Utility Agent Transfer",
+    "type": "contactFlow",
+    "ActionMetadata": {
+      "b1-hours": { "Hours": { "id": "arn:aws:connect:us-east-1:111122223333:instance/00000000-0000-0000-0000-000000000000/operating-hours/00000000-0000-0000-0000-000000000003", "text": "Customer Care Hours" } },
+      "b4-queue": { "queue": { "id": "arn:aws:connect:us-east-1:111122223333:instance/00000000-0000-0000-0000-000000000000/queue/00000000-0000-0000-0000-000000000004", "text": "Customer Care EN" } }
+    }
+  },
+  "Actions": [
+    {
+      "Identifier": "b1-hours",
+      "Type": "CheckHoursOfOperation",
+      "Parameters": { "HoursOfOperationId": "arn:aws:connect:us-east-1:111122223333:instance/00000000-0000-0000-0000-000000000000/operating-hours/00000000-0000-0000-0000-000000000003" },
+      "Transitions": {
+        "NextAction": "b2-closed",
+        "Conditions": [
+          { "NextAction": "b3-hold", "Condition": { "Operator": "Equals", "Operands": ["True"] } },
+          { "NextAction": "b2-closed", "Condition": { "Operator": "Equals", "Operands": ["False"] } }
+        ],
+        "Errors": [ { "NextAction": "b3-hold", "ErrorType": "NoMatchingError" } ]
+      }
+    },
+    {
+      "Identifier": "b2-closed",
+      "Type": "MessageParticipant",
+      "Parameters": { "Text": "Our office is closed. Please call back Monday to Friday, 8 AM to 6 PM." },
+      "Transitions": { "NextAction": "b7-end" }
+    },
+    {
+      "Identifier": "b3-hold",
+      "Type": "MessageParticipant",
+      "Parameters": { "PromptId": "arn:aws:connect:us-east-1:111122223333:instance/00000000-0000-0000-0000-000000000000/prompt/00000000-0000-0000-0000-000000000005" },
+      "Transitions": { "NextAction": "b4-queue" }
+    },
+    {
+      "Identifier": "b4-queue",
+      "Type": "UpdateContactTargetQueue",
+      "Parameters": { "QueueId": "arn:aws:connect:us-east-1:111122223333:instance/00000000-0000-0000-0000-000000000000/queue/00000000-0000-0000-0000-000000000004" },
+      "Transitions": { "NextAction": "b5-hooks", "Errors": [ { "NextAction": "b7-end", "ErrorType": "NoMatchingError" } ] }
+    },
+    {
+      "Identifier": "b5-hooks",
+      "Type": "UpdateContactEventHooks",
+      "Parameters": { "EventHooks": { "CustomerQueue": "arn:aws:connect:us-east-1:111122223333:instance/00000000-0000-0000-0000-000000000000/contact-flow/00000000-0000-0000-0000-000000000006" } },
+      "Transitions": { "NextAction": "b6-transfer" }
+    },
+    {
+      "Identifier": "b6-transfer",
+      "Type": "TransferContactToQueue",
+      "Parameters": {},
+      "Transitions": { "Errors": [ { "NextAction": "b7-end", "ErrorType": "QueueAtCapacity" }, { "NextAction": "b7-end", "ErrorType": "NoMatchingError" } ] }
+    },
+    {
+      "Identifier": "b7-end",
+      "Type": "DisconnectParticipant",
+      "Parameters": {},
+      "Transitions": {}
+    }
+  ]
+}
