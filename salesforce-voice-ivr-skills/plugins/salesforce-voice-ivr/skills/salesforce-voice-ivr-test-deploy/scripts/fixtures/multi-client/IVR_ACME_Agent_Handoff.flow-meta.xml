@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic multi-client self-test: a clean client agent-handoff subflow (no findings expected). -->
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Route_ACME_EN_Live</name>
+        <label>Route to ACME English Live Queue</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>routeWork</actionName>
+        <actionType>routeWork</actionType>
+        <faultConnector>
+            <targetReference>Msg_Error</targetReference>
+        </faultConnector>
+        <inputParameters>
+            <name>routingType</name>
+            <value><stringValue>QueueBased</stringValue></value>
+        </inputParameters>
+        <inputParameters>
+            <name>queueId</name>
+            <value><stringValue>00G000000000001</stringValue></value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Msg_Error</name>
+        <label>Error Message</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>playPromptAsyncAction</actionName>
+        <actionType>playPromptAsyncAction</actionType>
+        <inputParameters>
+            <name>promptType</name>
+            <value><stringValue>Message</stringValue></value>
+        </inputParameters>
+        <inputParameters>
+            <name>promptMessage</name>
+            <value><stringValue>Sorry, we cannot connect your call right now. Goodbye.</stringValue></value>
+        </inputParameters>
+        <inputParameters>
+            <name>userResponseSettings</name>
+            <value><booleanValue>false</booleanValue></value>
+        </inputParameters>
+        <inputParameters>
+            <name>languageValue</name>
+            <value><stringValue>en-US</stringValue></value>
+        </inputParameters>
+        <inputParameters>
+            <name>voiceProfileValue</name>
+            <value><stringValue>Voice1</stringValue></value>
+        </inputParameters>
+    </actionCalls>
+    <apiVersion>68.0</apiVersion>
+    <interviewLabel>IVR ACME Agent Handoff {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>IVR ACME Agent Handoff</label>
+    <processType>RoutingFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Route_ACME_EN_Live</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+</Flow>

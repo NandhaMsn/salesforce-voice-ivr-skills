@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic multi-client self-test: VoiceCall trigger with no client filter (client-scope WARN). -->
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Withdraw_Open_Requests</name>
+        <label>Withdraw Open Requests</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>CallbackRequestService</actionName>
+        <actionType>apex</actionType>
+        <faultConnector>
+            <targetReference>Keep_Error</targetReference>
+        </faultConnector>
+    </actionCalls>
+    <apiVersion>68.0</apiVersion>
+    <assignments>
+        <name>Keep_Error</name>
+        <label>Keep Error</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>faultMessage</assignToReference>
+            <operator>Assign</operator>
+            <value><elementReference>$Flow.FaultMessage</elementReference></value>
+        </assignmentItems>
+    </assignments>
+    <interviewLabel>IVR ACME Callback Withdraw {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>IVR ACME Callback Withdraw</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Withdraw_Open_Requests</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>CallType</field>
+            <operator>EqualTo</operator>
+            <value><stringValue>Inbound</stringValue></value>
+        </filters>
+        <filters>
+            <field>CallAcceptDateTime</field>
+            <operator>IsNull</operator>
+            <value><booleanValue>false</booleanValue></value>
+        </filters>
+        <object>VoiceCall</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
